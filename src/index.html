@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+
+    <title>Lista Artykułów</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 900px;
+        margin: 2rem auto;
+      }
+      .article {
+        border: 1px solid #ddd;
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+      button {
+        margin-right: 0.5rem;
+      }
+      #edit-modal.hidden {
+        display: none;
+      }
+      #edit-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border: 1px solid #aaa;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        width: 300px;
+      }
+      #modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 900;
+        display: none;
+      }
+      #modal-overlay.active {
+        display: block;
+      }
+      label {
+        display: block;
+        margin-top: 10px;
+      }
+      input,
+      textarea {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <a href="/login/">Login</a>
+      <h1>Lista Artykułów</h1>
+      <div id="articles-container"></div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal-overlay"></div>
+    <div id="edit-modal" class="hidden">
+      <form id="edit-form">
+        <input type="hidden" name="id" />
+        <label
+          >Tytuł:
+          <input type="text" name="title" required />
+        </label>
+        <label
+          >Podtytuł:
+          <input type="text" name="subtitle" />
+        </label>
+        <label
+          >Autor:
+          <input type="text" name="author" required />
+        </label>
+        <label
+          >Treść:
+          <textarea name="content" rows="5" required></textarea>
+        </label>
+        <div style="margin-top: 10px">
+          <button type="submit">Zapisz</button>
+          <button type="button" id="close-modal">Anuluj</button>
+        </div>
+      </form>
+    </div>
+
+    <script type="module" src="main.js"></script>
+
+    <button id="add-article-btn">Dodaj artykuł</button>
+    <button id="logout-btn">Wyloguj</button>
+
+    <div id="add-modal" class="modal hidden">
+      <div class="modal-content">
+        <button id="close-add-modal" class="close-btn">X</button>
+        <h2>Dodaj nowy artykuł</h2>
+        <form id="add-form">
+          <input type="text" name="title" placeholder="Tytuł" required />
+          <input type="text" name="subtitle" placeholder="Podtytuł" />
+          <input type="text" name="author" placeholder="Autor" required />
+          <textarea name="content" placeholder="Treść" required></textarea>
+          <button type="submit">Dodaj</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="modal-overlay" class="hidden"></div>
+  </body>
+</html>
