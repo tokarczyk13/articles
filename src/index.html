@@ -1,120 +1,224 @@
 <!DOCTYPE html>
 <html lang="pl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Articles</title>
 
-    <title>Lista Artykułów</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        max-width: 900px;
-        margin: 2rem auto;
-      }
-      .article {
-        border: 1px solid #ddd;
-        padding: 1rem;
-        margin-bottom: 1rem;
-      }
-      button {
-        margin-right: 0.5rem;
-      }
-      #edit-modal.hidden {
-        display: none;
-      }
-      #edit-modal {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
-        border: 1px solid #aaa;
-        padding: 20px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        z-index: 1000;
-        width: 300px;
-      }
-      #modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.3);
-        z-index: 900;
-        display: none;
-      }
-      #modal-overlay.active {
-        display: block;
-      }
-      label {
-        display: block;
-        margin-top: 10px;
-      }
-      input,
-      textarea {
-        width: 100%;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="app">
-      <a href="/login/">Login</a>
-      <h1>Lista Artykułów</h1>
-      <div id="articles-container"></div>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+    .btn-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .btn-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    .modal-overlay {
+      backdrop-filter: blur(4px);
+    }
+  </style>
+</head>
+<body class="bg-blue-50 min-h-screen">
+
+  <header class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <h1 class="text-xl font-semibold text-gray-900"></h1>
+        <nav class="flex items-center space-x-4">
+          <a href="/login/" id="login-link" 
+             class="text-blue-600 hover:text-blue-800 hover:underline focus:underline transition-colors duration-200">
+            Zaloguj się
+          </a>
+          <button id="logout-btn" 
+                  class="hidden bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md btn-hover transition-colors duration-200">
+            Wyloguj
+          </button>
+        </nav>
+      </div>
     </div>
+  </header>
 
-    <!-- Modal -->
-    <div id="modal-overlay"></div>
-    <div id="edit-modal" class="hidden">
-      <form id="edit-form">
-        <input type="hidden" name="id" />
-        <label
-          >Tytuł:
-          <input type="text" name="title" required />
-        </label>
-        <label
-          >Podtytuł:
-          <input type="text" name="subtitle" />
-        </label>
-        <label
-          >Autor:
-          <input type="text" name="author" required />
-        </label>
-        <label
-          >Treść:
-          <textarea name="content" rows="5" required></textarea>
-        </label>
-        <div style="margin-top: 10px">
-          <button type="submit">Zapisz</button>
-          <button type="button" id="close-modal">Anuluj</button>
-        </div>
-      </form>
-    </div>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <script type="module" src="main.js"></script>
+    <section class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+      <h2 class="text-2xl font-bold text-gray-900">Artykuły</h2>
+      <button id="add-article-btn" 
+              class="hidden bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg btn-hover transition-colors duration-200 font-medium">
+        <span class="inline-block mr-2 text-xl font-bold align-middle">+</span>
+        Dodaj artykuł
+      </button>
+    </section>
 
-    <button id="add-article-btn">Dodaj artykuł</button>
-    <button id="logout-btn">Wyloguj</button>
+    <section id="articles-container" class="space-y-6 bg-blue-100 rounded-lg p-6 shadow-inner min-h-[200px]">
+      <div class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <span class="ml-4 text-blue-800">Ładowanie artykułów...</span>
+      </div>
+    </section>
 
-    <div id="add-modal" class="modal hidden">
-      <div class="modal-content">
-        <button id="close-add-modal" class="close-btn">X</button>
-        <h2>Dodaj nowy artykuł</h2>
-        <form id="add-form">
-          <input type="text" name="title" placeholder="Tytuł" required />
-          <input type="text" name="subtitle" placeholder="Podtytuł" />
-          <input type="text" name="author" placeholder="Autor" required />
-          <textarea name="content" placeholder="Treść" required></textarea>
-          <button type="submit">Dodaj</button>
+  </main>
+
+  <div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-overlay z-40"></div>
+
+  <div id="edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Edytuj artykuł</h3>
+        <form id="edit-form" class="space-y-4">
+          <input type="hidden" name="id" />
+          
+          <div>
+            <label for="edit-title" class="block text-sm font-medium text-gray-700 mb-2">
+              Tytuł *
+            </label>
+            <input
+              type="text"
+              id="edit-title"
+              name="title"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Wprowadź tytuł artykułu"
+            />
+          </div>
+
+          <div>
+            <label for="edit-subtitle" class="block text-sm font-medium text-gray-700 mb-2">
+              Podtytuł
+            </label>
+            <input
+              type="text"
+              id="edit-subtitle"
+              name="subtitle"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Wprowadź podtytuł (opcjonalnie)"
+            />
+          </div>
+
+          <div>
+            <label for="edit-author" class="block text-sm font-medium text-gray-700 mb-2">
+              Autor 
+            </label>
+            <input
+              type="text"
+              id="edit-author"
+              name="author"            
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Wprowadź autora"
+            />
+          </div>
+
+          <div>
+            <label for="edit-content" class="block text-sm font-medium text-gray-700 mb-2">
+              Treść *
+            </label>
+            <textarea
+              id="edit-content"
+              name="content"
+              required
+              rows="6"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+              placeholder="Wprowadź treść artykułu"
+            ></textarea>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 pt-4">
+            <button type="submit" 
+                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md btn-hover transition-colors duration-200 font-medium">
+              Zapisz zmiany
+            </button>
+            <button type="button" id="close-modal" 
+                    class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-3 rounded-md btn-hover transition-colors duration-200 font-medium">
+              Anuluj
+            </button>
+          </div>
         </form>
       </div>
     </div>
+  </div>
 
-    <div id="modal-overlay" class="hidden"></div>
-  </body>
+  <div id="add-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Dodaj nowy artykuł</h3>
+        <form id="add-form" class="space-y-4">
+          
+          <div>
+            <label for="add-title" class="block text-sm font-medium text-gray-700 mb-2">
+              Tytuł *
+            </label>
+            <input
+              type="text"
+              id="add-title"
+              name="title"
+              required
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Wprowadź tytuł artykułu"
+            />
+          </div>
+
+          <div>
+            <label for="add-subtitle" class="block text-sm font-medium text-gray-700 mb-2">
+              Podtytuł
+            </label>
+            <input
+              type="text"
+              id="add-subtitle"
+              name="subtitle"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Wprowadź podtytuł (opcjonalnie)"
+            />
+          </div>
+
+          <div>
+            <label for="add-author" class="block text-sm font-medium text-gray-700 mb-2">
+              Autor
+            </label>
+            <input
+              type="text"
+              id="add-author"
+              name="author"
+            
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Wprowadź autora"
+            />
+          </div>
+
+          <div>
+            <label for="add-content" class="block text-sm font-medium text-gray-700 mb-2">
+              Treść *
+            </label>
+            <textarea
+              id="add-content"
+              name="content"
+              required
+              rows="6"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+              placeholder="Wprowadź treść artykułu"
+            ></textarea>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 pt-4">
+            <button type="submit" 
+                    class="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md btn-hover transition-colors duration-200 font-medium">
+              Dodaj artykuł
+            </button>
+            <button type="button" id="close-add-modal" 
+                    class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-3 rounded-md btn-hover transition-colors duration-200 font-medium">
+              Anuluj
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./main.js"></script>
+</body>
 </html>
